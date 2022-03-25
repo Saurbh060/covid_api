@@ -3,8 +3,9 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type MongoFields struct {
-	State      string  `bson:"state"`
-	TotalCases float64 `bson:"totalCases"`
+	State       string  `bson:"state"`
+	TotalCases  float64 `bson:"totalCases"`
+	LastUpdated string  `bson:"lastUpdated"`
 }
 
 type StateData struct {

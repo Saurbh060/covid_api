@@ -38,7 +38,11 @@ func SaveCovidData(c echo.Context) error {
 	var doc []interface{}
 
 	for key := range result {
-		n := m.MongoFields{State: key, TotalCases: result[key].(map[string]interface{})["total"].(map[string]interface{})["confirmed"].(float64)}
+		n := m.MongoFields{
+			State:       key,
+			TotalCases:  result[key].(map[string]interface{})["total"].(map[string]interface{})["confirmed"].(float64),
+			LastUpdated: result[key].(map[string]interface{})["meta"].(map[string]interface{})["last_updated"].(string),
+		}
 		docs = append(docs, n)
 		doc = append(doc, n)
 	}
@@ -123,8 +127,9 @@ func GetStateName(c echo.Context) error {
 		fetchedData := conn.ConnectAndGet(v)
 
 		responseData := &m.MongoFields{
-			State:      fetchedData.State,
-			TotalCases: fetchedData.TotalCases,
+			State:       fetchedData.State,
+			TotalCases:  fetchedData.TotalCases,
+			LastUpdated: fetchedData.LastUpdated,
 		}
 		fmt.Println("response: ", *responseData)
 		return c.JSON(http.StatusOK, responseData)
