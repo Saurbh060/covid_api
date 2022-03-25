@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/labstack/echo/v4"
 
@@ -18,23 +17,18 @@ import (
 
 func SaveCovidData(c echo.Context) error {
 
-	// Open our jsonFile
-	jsonFile, err := os.Open("data.min.json")
-	// if we os.Open returns an error then handle it
+	res, err := http.Get("https://data.covid19india.org/v4/min/data.min.json")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Print("\n\nSuccessfully Opened users.json\n\n")
-	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
+	log.Printf("\n\nSuccessfully Opened users.json\n\n")
+	defer res.Body.Close()
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	byteValue, _ := ioutil.ReadAll(res.Body)
 
 	var result map[string]interface{}
 	json.Unmarshal([]byte(byteValue), &result)
 
-	docs := []m.MongoFields{}
-	// doc := m.StateData{}
 	var doc []interface{}
 
 	for key := range result {
@@ -43,7 +37,7 @@ func SaveCovidData(c echo.Context) error {
 			TotalCases:  result[key].(map[string]interface{})["total"].(map[string]interface{})["confirmed"].(float64),
 			LastUpdated: result[key].(map[string]interface{})["meta"].(map[string]interface{})["last_updated"].(string),
 		}
-		docs = append(docs, n)
+		// docs = append(docs, n)
 		doc = append(doc, n)
 	}
 
